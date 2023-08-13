@@ -1,0 +1,9 @@
+{
+    "name": "train-station-skip",
+    "version": "0.1.0",
+    "title": "Train Station Skip",
+    "author": "Peter",
+    "factorio_version": "1.1",
+    "dependencies": ["base >= 1.1"],
+    "description": "Allows train to skip station/s when their waiting conditions have been already met."
+  }
