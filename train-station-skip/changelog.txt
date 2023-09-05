@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------------------------------
+Version: 0.1.1
+Date: 05. 09. 2023
+  Features:
+    - Added compatibility to LTN.
+  Bugfixes:
+    - Fixed a crash that would occur on when a train with circuit waiting conditions going to a station with empty circuit signals.

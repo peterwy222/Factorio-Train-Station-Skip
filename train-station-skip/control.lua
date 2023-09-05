@@ -2,7 +2,7 @@
 
 script.on_event(defines.events.on_train_changed_state,
   function(event)
-    if defines.train_state.on_the_path == event.train.state and event.train.schedule ~= nil and event.train.path_end_stop ~= nil and event.train.path_end_stop.name == "train-stop" then
+    if defines.train_state.on_the_path == event.train.state and event.train.schedule ~= nil and event.train.path_end_stop ~= nil and (event.train.path_end_stop.name == "train-stop" or event.train.path_end_stop.name == "logistic-train-stop") then
       local nextStationIndex = event.train.schedule.current
       local originalStart = event.train.schedule.current
       while waitConditionsMet(event.train.schedule.records[nextStationIndex].wait_conditions , event.train, event.train.path_end_stop) do
@@ -119,13 +119,13 @@ function waitConditionMet(waitCondition, train, trainStop)
 end
 
 function controlBehaviorCircuitConditionMet(controlBehavior, condition)
-  local redFirstSignal = controlBehavior.get_circuit_network(defines.wire_type.red).get_signal(condition.first_signal)
-  local greenFirstSignal = controlBehavior.get_circuit_network(defines.wire_type.green).get_signal(condition.first_signal)
+  local redFirstSignal = controlBehavior.get_circuit_network(defines.wire_type.red) ~= nil and controlBehavior.get_circuit_network(defines.wire_type.red).get_signal(condition.first_signal) or nil
+  local greenFirstSignal = controlBehavior.get_circuit_network(defines.wire_type.green) ~= nil and controlBehavior.get_circuit_network(defines.wire_type.green).get_signal(condition.first_signal) or nil
   local redSecondSignal = condition.constant
   local greenSecondSignal = condition.constant
   if condition.second_signal ~= nil then
-    redSecondSignal = controlBehavior.get_circuit_network(defines.wire_type.red).get_signal(condition.second_signal)
-    greenSecondSignal = controlBehavior.get_circuit_network(defines.wire_type.green).get_signal(condition.second_signal)
+    redSecondSignal = controlBehavior.get_circuit_network(defines.wire_type.red) ~= nil and controlBehavior.get_circuit_network(defines.wire_type.red).get_signal(condition.second_signal) or nil
+    greenSecondSignal = controlBehavior.get_circuit_network(defines.wire_type.green) ~= nil and controlBehavior.get_circuit_network(defines.wire_type.green).get_signal(condition.second_signal) or nil
   end
   return circuitConditionMet(condition.comparator, redFirstSignal, redSecondSignal) or circuitConditionMet(condition.comparator, greenFirstSignal, greenSecondSignal)
 end
@@ -155,4 +155,19 @@ function circuitConditionMet(comparator, firstSignal, secondSignal)
     end
   }
   return comparatorMap[comparator]()
+end
+
+function tprint (tbl, indent)
+  if not indent then indent = 0 end
+  for k, v in pairs(tbl) do
+    formatting = string.rep("  ", indent) .. k .. ": "
+    if type(v) == "table" then
+      game.print(formatting)
+      tprint(v, indent+1)
+    elseif type(v) == 'boolean' then
+      game.print(formatting .. tostring(v))      
+    else
+      game.print(formatting .. v)
+    end
+  end
 end
